@@ -452,7 +452,17 @@ function markArabic(t){
 
 // ============= AUDIO =============
 let curEl_a = null;
-let speechSynth = window.speechSynthesis;
+const AUDIO_BASE = (()=>{
+  const p = window.location.pathname;
+  const base = p.endsWith('/') ? p : p.substring(0, p.lastIndexOf('/')+1);
+  return base;
+})();
+
+function resolveUrl(rel){
+  if(rel.startsWith('http')) return rel;
+  const b = AUDIO_BASE.endsWith('/') ? AUDIO_BASE : AUDIO_BASE+'/';
+  return b + rel;
+}
 
 function wireAudio(){
   const w=document.getElementById('contentWrapper');
@@ -466,53 +476,41 @@ function wireAudio(){
 
 async function playAudio(el,text){
   // Stop previous
-  if(speechSynth.speaking) speechSynth.cancel();
-  if(curEl_a){curEl_a.classList.remove('playing');curEl_a=null}
-
-  // On localhost: try pre-generated MP3 first, then server API
-  if(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1'){
-    const path=audioMap[text];
-    if(path){
+  const oldEl=curEl_a;
+  if(oldEl) oldEl.classList.remove('playing');
+  curEl_a=null;
+  
+  const path=audioMap[text];
+  if(!path){
+    // No pre-gen audio: try local server
+    if(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1'){
+      el.classList.add('playing');
       try{
-        const a=document.getElementById('hiddenPlayer')||new Audio();
-        a.src=path;
-        curEl_a=el;el.classList.add('playing');
-        await a.play();
-        a.onended=()=>{el.classList.remove('playing');curEl_a=null};
-        return;
+        const r=await fetch('/api/tts?text='+encodeURIComponent(text));
+        const j=await r.json();
+        if(j.status!=='error'&&j.path){
+          const a=document.getElementById('hiddenPlayer')||new Audio();
+          a.src=j.path;
+          curEl_a=el;el.classList.add('playing');
+          await a.play();
+          a.onended=()=>{el.classList.remove('playing');curEl_a=null};
+          return;
+        }
       }catch(e){}
     }
-    // Try server API
     el.classList.add('playing');
-    try{
-      const r=await fetch(`/api/tts?text=${encodeURIComponent(text)}`);
-      const j=await r.json();
-      if(j.status!=='error'&&j.path){
-        const a=document.getElementById('hiddenPlayer')||new Audio();
-        a.src=j.path;
-        curEl_a=el;el.classList.add('playing');
-        await a.play();
-        a.onended=()=>{el.classList.remove('playing');curEl_a=null};
-        return;
-      }
-    }catch(e){}
-  }
-
-  // GitHub Pages / fallback: use browser Speech Synthesis (works offline, no audio files needed)
-  try{
-    el.classList.add('playing');
-    const utter=new SpeechSynthesisUtterance(text);
-    utter.lang='ar-SA';
-    utter.rate=0.9;
-    // Try to find an Arabic voice
-    const voices=speechSynth.getVoices();
-    const arVoice=voices.find(v=>v.lang.startsWith('ar'));
-    if(arVoice) utter.voice=arVoice;
-    curEl_a=el;
-    utter.onend=()=>{el.classList.remove('playing');curEl_a=null};
-    utter.onerror=()=>{el.classList.remove('playing');curEl_a=null};
-    speechSynth.speak(utter);
+    await new Promise(r=>setTimeout(r,300));
+    el.classList.remove('playing');
     return;
+  }
+  
+  // Try pre-generated audio
+  try{
+    const a=document.getElementById('hiddenPlayer')||new Audio();
+    a.src=resolveUrl(path);
+    curEl_a=el;el.classList.add('playing');
+    await a.play();
+    a.onended=()=>{el.classList.remove('playing');curEl_a=null};
   }catch(e){
     el.classList.add('playing');
     await new Promise(r=>setTimeout(r,300));
