@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阿拉伯语语法大全 - 交互式自学平台</title>
+<style>
+:root {
+  --gold: #c8a44e;
+  --gold-light: #e8d5a3;
+  --gold-dark: #a88530;
+  --gold-glow: rgba(200,164,78,0.2);
+  --navy: #0d1b3e;
+  --navy-light: #162b5e;
+  --navy-dark: #070f24;
+  --terracotta: #a0522d;
+  --terracotta-light: #c4734a;
+  --green: #2e7d32;
+  --green-light: #4caf50;
+  --text-light: #e8e0d0;
+  --text-muted: rgba(255,255,255,0.45);
+  --bg-main: #0d1b3e;
+  --bg-sidebar: #0a1630;
+  --bg-card: rgba(255,255,255,0.04);
+  --border: rgba(200,164,78,0.12);
+  --radius: 12px;
+  --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+  --font-arabic: 'Traditional Arabic','Scheherazade New','Amiri','Noto Naskh Arabic','Arabic Typesetting',serif;
+  --font-body: 'Segoe UI','PingFang SC','Microsoft YaHei',system-ui,-apple-system,sans-serif;
+  --font-heading: Georgia,'Noto Serif SC','Source Han Serif SC',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg-main);color:var(--text-light);min-height:100vh;overflow-x:hidden}
+
+/* ===== Banner ===== */
+.top-banner{
+  position:fixed;top:0;left:0;right:0;z-index:1001;height:56px;
+  background:linear-gradient(135deg,var(--navy-dark),var(--navy),var(--navy-dark));
+  border-bottom:2px solid var(--gold-dark);
+  display:flex;align-items:center;padding:0 20px;
+  box-shadow:0 2px 20px rgba(0,0,0,.5)
+}
+.top-banner::after{
+  content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent)
+}
+.banner-title{
+  font-family:var(--font-heading);font-size:20px;color:var(--gold);
+  display:flex;align-items:center;gap:12px
+}
+.banner-title .icon{font-size:24px}
+.banner-title .ar-sub{font-family:var(--font-arabic);font-size:14px;color:var(--gold-light)}
+.menu-toggle{display:none;background:none;border:none;color:var(--gold);font-size:24px;cursor:pointer;margin-right:12px;padding:4px}
+.search-box{margin-left:auto;position:relative}
+.search-box input{
+  background:rgba(255,255,255,.08);border:1px solid var(--gold-dark);border-radius:20px;
+  padding:7px 16px 7px 36px;color:var(--text-light);font-size:14px;width:220px;
+  outline:none;transition:var(--transition)
+}
+.search-box input:focus{background:rgba(255,255,255,.12);border-color:var(--gold);width:280px}
+.search-box input::placeholder{color:rgba(255,255,255,.35)}
+.search-box .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.5;pointer-events:none}
+
+/* ===== Sidebar ===== */
+.sidebar{
+  position:fixed;top:56px;left:0;bottom:0;width:300px;
+  background:var(--bg-sidebar);border-right:1px solid var(--border);
+  z-index:1000;overflow-y:auto;transition:transform var(--transition);padding-bottom:40px
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:2px}
+.sidebar-header{
+  padding:16px 16px 8px;font-size:11px;text-transform:uppercase;
+  letter-spacing:2px;color:rgba(255,255,255,.25);
+  border-bottom:1px solid var(--border);margin-bottom:4px
+}
+.stage-nav{list-style:none}
+.stage-nav-item{border-bottom:1px solid rgba(200,164,78,.05)}
+.stage-toggle{
+  display:flex;align-items:center;width:100%;padding:10px 16px;
+  background:none;border:none;color:var(--gold-light);font-size:13px;
+  text-align:left;cursor:pointer;transition:var(--transition);gap:8px
+}
+.stage-toggle:hover{background:rgba(200,164,78,.07);color:var(--gold)}
+.stage-toggle .num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:50%;background:var(--gold-dark);
+  color:var(--navy-dark);font-size:11px;font-weight:700;flex-shrink:0
+}
+.stage-toggle .arrow{margin-left:auto;transition:transform var(--transition);font-size:10px}
+.stage-toggle .arrow.open{transform:rotate(90deg)}
+.stage-toggle .sections-count{font-size:10px;color:rgba(255,255,255,.25);margin-left:auto;margin-right:8px}
+.section-list{list-style:none;max-height:0;overflow:hidden;transition:max-height .4s ease}
+.section-list.open{max-height:2000px}
+.section-link{
+  display:flex;align-items:center;padding:7px 16px 7px 46px;
+  color:rgba(255,255,255,.5);font-size:12.5px;text-decoration:none;
+  transition:var(--transition);border-left:3px solid transparent;gap:8px
+}
+.section-link:hover{color:var(--gold-light);background:rgba(200,164,78,.04);border-left-color:rgba(200,164,78,.25)}
+.section-link.active{color:var(--gold);border-left-color:var(--gold);background:rgba(200,164,78,.07)}
+
+/* ===== Main ===== */
+.main-content{margin-left:300px;margin-top:56px;min-height:calc(100vh - 56px)}
+.content-wrapper{max-width:920px;margin:0 auto;padding:40px 48px 100px}
+.progress-bar-container{position:fixed;top:56px;left:300px;right:0;height:3px;z-index:999}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));transition:width .3s ease}
+
+/* ===== Hero ===== */
+.hero{text-align:center;padding:50px 20px 36px;margin-bottom:32px;background:radial-gradient(ellipse at 50% 0,rgba(200,164,78,.07) 0,transparent 70%);border-bottom:1px solid var(--border)}
+.hero .ar-title{font-family:var(--font-arabic);font-size:40px;color:var(--gold);margin-bottom:14px;line-height:1.5}
+.hero h1{font-family:var(--font-heading);font-size:30px;color:var(--gold-light);margin-bottom:10px}
+.hero p{color:var(--text-muted);max-width:620px;margin:0 auto;line-height:1.8;font-size:14px}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:28px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:28px;font-weight:700;color:var(--gold)}
+.hero-stat .label{font-size:12px;color:var(--text-muted);margin-top:4px}
+
+/* ===== Sections ===== */
+.section-block{margin-bottom:48px;animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.section-header{margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-header h2{font-family:var(--font-heading);font-size:22px;color:var(--gold);line-height:1.5}
+.section-header .ar-section-title{font-family:var(--font-arabic);font-size:16px;color:var(--gold-dark);margin-top:4px}
+.subsection-block{margin-bottom:22px;padding:22px 26px;background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);transition:var(--transition)}
+.subsection-block:hover{border-color:rgba(200,164,78,.2);background:rgba(255,255,255,.055)}
+.subsection-block h3{font-family:var(--font-heading);font-size:16px;color:var(--terracotta-light);margin-bottom:12px;display:flex;align-items:center;gap:8px;line-height:1.5}
+.subsection-block h3 .ar-inline{font-family:var(--font-arabic);font-size:14px;color:var(--gold-dark)}
+
+/* ===== Content ===== */
+.content-body{font-size:15px;line-height:1.9;color:var(--text-light)}
+.content-body p{margin-bottom:10px}
+.content-body strong{color:var(--gold-light)}
+.content-body em{color:var(--green-light)}
+.content-body blockquote{border-left:3px solid var(--gold);padding:10px 20px;margin:12px 0;background:rgba(200,164,78,.05);color:rgba(255,255,255,.65);font-style:italic;border-radius:0 8px 8px 0}
+.content-body hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.content-body table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border-radius:8px;overflow:hidden}
+.content-body thead{background:linear-gradient(135deg,var(--gold-dark),var(--gold))}
+.content-body th{padding:10px 12px;color:var(--navy-dark);font-weight:700;text-align:left;font-size:13px}
+.content-body td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top;font-size:13px}
+.content-body tr:last-child td{border-bottom:none}
+.content-body tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+.content-body tr:hover td{background:rgba(200,164,78,.04)}
+.content-body ul,.content-body ol{padding-left:24px;margin:8 0}
+.content-body li{margin-bottom:5px}
+.content-body pre{background:rgba(0,0,0,.3);padding:12px 16px;border-radius:8px;overflow-x:auto;font-size:13px;border:1px solid var(--border);margin:12px 0}
+
+/* ===== Arabic Text ===== */
+.ar-text{
+  font-family:var(--font-arabic);cursor:pointer;
+  display:inline-block;position:relative;padding:2px 4px;border-radius:4px;
+  transition:var(--transition);color:var(--gold-light);font-size:1.05em
+}
+.ar-text:hover{background:rgba(200,164,78,.12)}
+.ar-text.playing{background:rgba(200,164,78,.22);box-shadow:0 0 0 2px var(--gold-dark)}
+.ar-text.ar-no-audio{color:var(--gold-dark);opacity:.7}
+.ar-text.ar-no-audio:hover{background:rgba(200,164,78,.06)}
+.ar-text .audio-badge{font-size:9px;margin-left:2px;opacity:0;display:inline-block;vertical-align:super;transition:var(--transition)}
+.ar-text:hover .audio-badge{opacity:.7}
+.ar-text.playing .audio-badge{opacity:1}
+
+/* ===== Search ===== */
+.search-overlay{display:none;position:fixed;top:56px;left:300px;right:0;bottom:0;background:rgba(7,15,36,.96);z-index:1500;padding:24px 40px;overflow-y:auto}
+.search-overlay.open{display:block}
+.search-overlay h3{color:var(--gold);margin-bottom:20px;font-size:17px;font-weight:400}
+.search-result{padding:14px 18px;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:10px;border:1px solid var(--border);cursor:pointer;transition:var(--transition)}
+.search-result:hover{border-color:var(--gold-dark);background:rgba(200,164,78,.06)}
+.search-result .loc{font-size:11px;color:var(--text-muted);margin-bottom:4px}
+.search-result .preview{color:var(--text-light);font-size:14px;line-height:1.6}
+.search-result .preview mark{background:rgba(200,164,78,.2);color:var(--gold);padding:1px 4px;border-radius:3px}
+.search-close{position:fixed;top:66px;right:44px;background:none;border:none;color:var(--gold);font-size:30px;cursor:pointer;opacity:.5;transition:var(--transition);z-index:1501}
+.search-close:hover{opacity:1}
+.search-empty{text-align:center;padding:60px 20px;color:var(--text-muted)}
+
+/* ===== Responsive ===== */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}.main-content{margin-left:0}
+  .progress-bar-container,.search-overlay{left:0}.menu-toggle{display:block}
+  .content-wrapper{padding:24px 16px 60px}
+  .search-box input{width:130px}.search-box input:focus{width:170px}
+  .hero-stats{gap:24px}.search-overlay{padding:20px 16px;left:0}.search-close{right:20px}
+}
+@media(max-width:600px){
+  .banner-title{font-size:15px}.banner-title .ar-sub{display:none}
+  .search-box input{width:90px;font-size:12px;padding:5px 8px 5px 28px}
+  .search-box input:focus{width:130px}.content-wrapper{padding:16px 10px 40px}
+  .hero{padding:28px 10px 20px}.hero .ar-title{font-size:26px}.hero h1{font-size:20px}
+  .subsection-block{padding:14px 14px}.content-body{font-size:14px}
+  .content-body table,.content-body th,.content-body td{font-size:11px}
+  .content-body th,.content-body td{padding:5px 6px}
+}
+</style>
+</head>
+<body>
+
+<header class="top-banner">
+  <button class="menu-toggle" id="menuToggle" aria-label="菜单">☰</button>
+  <div class="banner-title">
+    <span class="icon">🕌</span>
+    <span>阿拉伯语语法大全</span>
+    <span class="ar-sub">قواعد اللغة العربية</span>
+  </div>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="搜索语法..." autocomplete="off">
+  </div>
+</header>
+
+<!-- Hidden audio player for all pronunciations -->
+<audio id="hiddenPlayer" preload="auto" type="audio/mpeg" style="display:none"></audio>
+
+<div class="progress-bar-container"><div class="progress-bar-fill" id="progressFill"></div></div>
+
+<div class="search-overlay" id="searchOverlay">
+  <button class="search-close" id="searchClose">✕</button>
+  <h3 id="searchTitle">搜索结果</h3>
+  <div id="searchResults"></div>
+</div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">📖 目录导航</div>
+  <ul class="stage-nav" id="stageNav"></ul>
+</nav>
+
+<main class="main-content" id="mainContent">
+  <div class="content-wrapper" id="contentWrapper"></div>
+</main>
+
+<script>
+// ============= DATA =============
+let grammarData = [];
+let audioMap = {};      // text→path
+let audioHashMap = {};  // hash→path (Python MD5[:12])
+const audioCache = {};
+const arabicRE = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+/g;
+
+const DATA_BASE = window.location.hostname.includes('github.io') 
+  ? '/arabic-grammar/data/' : 'data/';
+
+async function loadData(){
+  try{
+    const [d,a]=await Promise.all([
+      fetch(DATA_BASE+'grammar_data.json').then(r=>r.json()),
+      fetch(DATA_BASE+'audio_map.json').then(r=>r.json()).catch(()=>({text:{},hash:{}}))
+    ]);
+    grammarData=d;audioMap=a.text||{};audioHashMap=a.hash||{};
+    const dbg=document.getElementById('debugInfo');
+    if(dbg) dbg.textContent='✓ 已加载 '+d.length+' 阶段, '+Object.keys(audioMap).length+' 音频';
+    console.log(`Loaded ${d.length} stages, ${Object.keys(a).length} audio items`);
+    render();
+  }catch(e){
+    const msg=e.message||'未知错误';
+    document.getElementById('contentWrapper').innerHTML=
+      '<div style="text-align:center;padding:80px 20px;color:var(--text-muted)">'
+      +'<div style="font-size:60px;margin-bottom:20px">⚠️</div>'
+      +'<h2>数据加载失败</h2>'
+      +'<p style="margin-top:12px">'+msg+'</p>'
+      +'<p style="margin-top:8px;font-size:12px">请确认 data/ 目录下存在 grammar_data.json</p></div>';
+  }
+}
+
+// ============= RENDER =============
+function render(){renderSidebar();renderContent()}
+
+function renderSidebar(){
+  const nav=document.getElementById('stageNav');nav.innerHTML='';
+  grammarData.forEach((stage,si)=>{
+    const secs=stage.sections||[];
+    const li=document.createElement('li');li.className='stage-nav-item';
+    const btn=document.createElement('button');btn.className='stage-toggle';
+    const cleanTitle=stage.title.replace(/（[^）]*）/g,'');
+    btn.innerHTML=`<span class="num">${si+1}</span><span>${cleanTitle.substring(0,32)}</span>
+      <span class="sections-count">${secs.length}节</span><span class="arrow">▶</span>`;
+    const sl=document.createElement('ul');sl.className='section-list';sl.id=`slist-${si}`;
+    secs.forEach((sec,ci)=>{
+      const sLi=document.createElement('li');sLi.className='section-item';
+      const a=document.createElement('a');a.className='section-link';a.href=`#s${si}-${ci}`;
+      a.textContent=sec.title.substring(0,42);
+      sLi.appendChild(a);sl.appendChild(sLi);
+    });
+    btn.addEventListener('click',()=>{
+      sl.classList.toggle('open');btn.querySelector('.arrow').classList.toggle('open');
+      document.getElementById(`stage-${si}`)?.scrollIntoView({behavior:'smooth',block:'start'});
+      if(innerWidth<=900) document.getElementById('sidebar').classList.remove('open');
+    });
+    li.appendChild(btn);li.appendChild(sl);nav.appendChild(li);
+  });
+}
+
+function renderContent(){
+  const w=document.getElementById('contentWrapper');
+  let ts=0;grammarData.forEach(s=>ts+=(s.sections||[]).length);
+  let html=`<section class="hero">
+    <div class="ar-title">قواعد اللغة العربية</div>
+    <h1>阿拉伯语语法大全</h1>
+    <p>从语音学基础到高级修辞，系统掌握阿拉伯语语法的完整体系。<br>点击任意阿拉伯语文本即可听取标准发音。</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">${grammarData.length}</div><div class="label">学习阶段</div></div>
+      <div class="hero-stat"><div class="num">${ts}</div><div class="label">语法章节</div></div>
+      <div class="hero-stat"><div class="num">${Object.keys(audioMap).length}+</div><div class="label">发音条目</div></div>
+    </div>
+    <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.3)" id="debugInfo">🔄 初始化中...</div>
+  </section>`;
+  grammarData.forEach((stage,si)=>{
+    const secs=stage.sections||[];
+    const stageAr=extractArabic(stage.title);
+    html+=`<section class="section-block" id="stage-${si}">
+      <div class="section-header"><h2>${markArabic(stage.title)}</h2>
+      ${stageAr?`<div class="ar-section-title">${markArabic(stageAr)}</div>`:''}</div>`;
+    secs.forEach((sec,ci)=>{
+      html+=`<div class="subsection-block" id="s${si}-${ci}">
+        <h3>${markArabic(sec.title)}</h3>
+        ${sec.content?`<div class="content-body">${renderMD(sec.content)}</div>`:''}`;
+      (sec.subsections||[]).forEach(sub=>{
+        html+=`<div class="subsection-block" style="margin-bottom:14px;padding:14px 18px">
+          <h4 style="font-size:14px;color:var(--gold-dark);margin-bottom:10px">${markArabic(sub.title)}</h4>
+          ${sub.content?`<div class="content-body">${renderMD(sub.content)}</div>`:''}</div>`;
+      });
+      html+=`</div>`;
+    });
+    html+=`</section>`;
+  });
+  w.innerHTML=html;
+  wireAudio();trackScroll();
+  document.querySelectorAll('[id^="s"]').forEach(el=>{el.style.scrollMarginTop='70px'});
+}
+
+// ============= MARKDOWN =============
+// Line-by-line rendering to avoid regex edge-case leaks
+function renderMD(text){
+  if(!text)return'';
+  const lines=text.split('\n');
+  let out=[],i=0,tableMode=false,tableHead=[],tableRows=[],listMode=false,listTag='ul',preMode=false,preBuf='',bqMode=false,bqBuf='';
+  
+  function flushBq(){
+    if(bqBuf){
+      out.push('<blockquote>'+inline(bqBuf)+'</blockquote>');
+      bqBuf='';bqMode=false;
+    }
+  }
+  function flushTable(){
+    if(tableMode){
+      out.push('<table><thead><tr>'+tableHead.map(x=>'<th>'+inline(x)+'</th>').join('')+'</tr></thead><tbody>');
+      tableRows.forEach(r=>out.push('<tr>'+r.map(c=>'<td>'+inline(c)+'</td>').join('')+'</tr>'));
+      out.push('</tbody></table>');
+      tableMode=false;tableHead=[];tableRows=[];
+    }
+  }
+  function flushList(){
+    if(listMode){out.push('</'+listTag+'>');listMode=false;}
+  }
+  
+  while(i<lines.length){
+    let line=lines[i],trimmed=line.trim();
+    
+    // Code block
+    if(trimmed.startsWith('```')){
+      flushBq();flushTable();flushList();
+      preMode=!preMode;
+      if(!preMode){out.push('<pre>'+escHtml(preBuf)+'</pre>');preBuf='';}
+      i++;continue;
+    }
+    if(preMode){preBuf+=line+'\n';i++;continue;}
+    
+    // Horizontal rule
+    if(/^\*{3,}$/.test(trimmed)){flushBq();flushTable();flushList();out.push('<hr>');i++;continue;}
+    
+    // Blockquote
+    if(trimmed.startsWith('> ')){
+      flushTable();flushList();
+      bqMode=true;
+      bqBuf+=(bqBuf?'\n':'')+trimmed.substring(2);
+      i++;continue;
+    }
+    if(bqMode&&!trimmed.startsWith('> ')){flushBq();}
+    
+    // Table row
+    if(trimmed.startsWith('|')&&trimmed.endsWith('|')){
+      // Separator row
+      if(/^\|[-| :]+\|$/.test(trimmed)){
+        if(!tableMode){i++;continue;}
+        // This is the separator after header - skip it
+        i++;continue;
+      }
+      if(tableMode&&tableHead.length===0){
+        // We already have a header from previous line
+        i++;continue;
+      }
+      if(!tableMode){
+        tableMode=true;tableHead=[];tableRows=[];
+        tableHead=trimmed.split('|').filter(x=>x.trim()).map(x=>x.trim());
+        i++;continue;
+      }
+      // Data row
+      const cells=trimmed.split('|').filter(x=>x.trim()).map(x=>x.trim());
+      if(cells.length>0) tableRows.push(cells);
+      i++;continue;
+    }
+    flushTable();
+    
+    // Empty line
+    if(trimmed===''){flushList();out.push('</p><p>');i++;continue;}
+    
+    // List item
+    const listMatch=trimmed.match(/^([*+-])\s+(.+)$/);
+    if(listMatch){
+      if(!listMode){listMode=true;listTag='ul';out.push('<ul>');}
+      out.push('<li>'+inline(listMatch[2])+'</li>');
+      i++;continue;
+    }
+    const olMatch=trimmed.match(/^\d+\.\s+(.+)$/);
+    if(olMatch){
+      if(!listMode){listMode=true;listTag='ol';out.push('<ol>');}
+      out.push('<li>'+inline(olMatch[1])+'</li>');
+      i++;continue;
+    }
+    flushList();
+    
+    // Regular text line
+    out.push(inline(trimmed)+' ');
+    i++;
+  }
+  
+  // Flush remaining
+  flushBq();flushTable();flushList();
+  let result=out.join('\n').replace(/<\/p><p>\s*<\/p><p>/g,'</p><p>').replace(/^<\/p><p>/,'').replace(/<\/p><p>$/,'');
+  if(!result.startsWith('<')) result='<p>'+result+'</p>';
+  return result;
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function inline(t){
+  let s=t;
+  s=s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  s=markArabic(s);
+  return s;
+}
+
+// ============= ARABIC =============
+function extractArabic(t){const m=t.match(arabicRE);return m?m.join(' '):''}
+
+function markArabic(t){
+  return t.replace(arabicRE,m=>{
+    const has=!!audioMap[m];
+    return `<span class="ar-text${has?'':' ar-no-audio'}" data-ar="${m}">${m}<span class="audio-badge">${has?'🔊':'🔇'}</span></span>`;
+  });
+}
+
+// ============= AUDIO =============
+// Audio element reference and state
+let audioPlayer = document.getElementById('hiddenPlayer');
+let curEl_a = null;
+let audioReady = false;
+
+// Compute audio base URL once (handles GitHub Pages sub-path)
+const AUDIO_BASE = (()=>{
+  // On GitHub Pages: /arabic-grammar/
+  // Local: /
+  const p = window.location.pathname;
+  const base = p.endsWith('/') ? p : p.substring(0, p.lastIndexOf('/')+1);
+  return base;
+})();
+
+function resolveAudioUrl(relPath){
+  // If already absolute, return as-is
+  if(relPath.startsWith('http')) return relPath;
+  // Ensure base ends with /
+  const b = AUDIO_BASE.endsWith('/') ? AUDIO_BASE : AUDIO_BASE+'/';
+  return b + relPath;
+}
+
+function wireAudio(){
+  // Use event delegation on the content wrapper — works even if content is re-rendered
+  const w=document.getElementById('contentWrapper');
+  w.addEventListener('click',function(e){
+    const span=e.target.closest('.ar-text');
+    if(!span) return;
+    const t=span.dataset.ar;
+    if(t) playAudio(span,t);
+  });
+}
+
+async function playAudio(el,text){
+  // Stop previous playback
+  if(audioPlayer){audioPlayer.pause();audioPlayer.currentTime=0;}
+  if(curEl_a){curEl_a.classList.remove('playing');curEl_a=null}
+  
+  const path=audioMap[text];
+  if(!path){
+    const isLocal=window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1';
+    if(isLocal){
+      el.classList.add('playing');
+      try{
+        const r=await fetch(`/api/tts?text=${encodeURIComponent(text)}`);
+        const j=await r.json();
+        if(j.status!=='error'&&j.path){
+          audioMap[text]=j.path;
+          el.querySelector('.audio-badge').textContent='🔊';
+          el.classList.remove('ar-no-audio');
+          return playAudio(el,text);
+        }
+      }catch(e){}
+    }
+    el.classList.add('playing');
+    await new Promise(r=>setTimeout(r,300));
+    el.classList.remove('playing');
+    return;
+  }
+  
+  // Resolve absolute URL
+  const fullUrl=resolveAudioUrl(path);
+  
+  try{
+    audioPlayer.src=fullUrl;
+    curEl_a=el;el.classList.add('playing');
+    await audioPlayer.play();
+    audioPlayer.onended=()=>{el.classList.remove('playing');curEl_a=null};
+  }catch(e){
+    // Fallback: create fresh audio element
+    try{
+      const fallback=new Audio(fullUrl);
+      curEl_a=el;el.classList.add('playing');
+      await fallback.play();
+      fallback.onended=()=>{el.classList.remove('playing');curEl_a=null};
+    }catch(e2){
+      el.classList.add('playing');
+      await new Promise(r=>setTimeout(r,300));
+      el.classList.remove('playing');
+    }
+  }
+}
+
+// ============= SCROLL =============
+function trackScroll(){
+  const pb=document.getElementById('progressFill');
+  document.addEventListener('scroll',()=>{
+    const s=window.scrollY,h=document.documentElement.scrollHeight-innerHeight;
+    pb.style.width=(h>0?Math.min(s/h*100,100):0)+'%';
+  });
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        document.querySelectorAll('.section-link').forEach(l=>l.classList.remove('active'));
+        const l=document.querySelector(`.section-link[href="#${e.target.id}"]`);
+        if(l)l.classList.add('active');
+      }
+    });
+  },{threshold:.3});
+  document.querySelectorAll('[id^="s"]').forEach(el=>obs.observe(el));
+}
+
+// ============= SEARCH =============
+const sInp=document.getElementById('searchInput');const sOvl=document.getElementById('searchOverlay');
+const sRes=document.getElementById('searchResults');const sCls=document.getElementById('searchClose');
+let sTm=null;
+
+sInp.addEventListener('input',()=>{clearTimeout(sTm);const q=sInp.value.trim();if(q.length<2){sOvl.classList.remove('open');return}sTm=setTimeout(()=>doSearch(q),250);});
+sCls.addEventListener('click',()=>{sOvl.classList.remove('open');sInp.value=''});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){sOvl.classList.remove('open');sInp.value=''}if(e.key==='/'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();sInp.focus()}});
+
+function doSearch(q){
+  const lq=q.toLowerCase();const res=[];
+  grammarData.forEach((st,si)=>(st.sections||[]).forEach((se,ci)=>{
+    const chk=(t)=>{if(t&&t.toLowerCase().includes(lq)) res.push({stage:si,sec:ci,text:t.substring(0,120)})};
+    chk(se.title);chk(se.content);(se.subsections||[]).forEach(sub=>{chk(sub.title);chk(sub.content)});
+  }));
+  const seen=new Set();const uniq=res.filter(r=>{const k=`${r.stage}-${r.sec}`;if(seen.has(k))return false;seen.add(k);return true});
+  document.getElementById('searchTitle').textContent=`找到 ${uniq.length} 项 (${q})`;
+  sRes.innerHTML=uniq.length?uniq.map(r=>{
+    const idx=r.text.toLowerCase().indexOf(lq);
+    const preview=idx>=0?r.text.substring(0,idx)+'<mark>'+r.text.substring(idx,idx+q.length)+'</mark>'+r.text.substring(idx+q.length):r.text;
+    return `<div class="search-result" onclick="goto(${r.stage},${r.sec})"><div class="loc">阶段${r.stage+1} › ${r.sec+1}</div><div class="preview">${preview}</div></div>`;
+  }).join(''):'<div class="search-empty">未找到匹配内容</div>';
+  sOvl.classList.add('open');
+}
+function goto(si,ci){sOvl.classList.remove('open');sInp.value='';const el=document.getElementById(`s${si}-${ci}`);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});const sl=document.getElementById(`slist-${si}`);if(sl){sl.classList.add('open');const t=sl.closest('.stage-nav-item')?.querySelector('.arrow');if(t)t.classList.add('open')}}
+
+// ============= MOBILE =============
+document.getElementById('menuToggle').addEventListener('click',()=>{document.getElementById('sidebar').classList.toggle('open')});
+document.addEventListener('click',e=>{const sb=document.getElementById('sidebar');if(innerWidth<=900&&sb.classList.contains('open')&&!sb.contains(e.target)&&e.target!==document.getElementById('menuToggle'))sb.classList.remove('open')});
+
+// ============= INIT =============
+loadData();
+</script>
+</body>
+</html>
