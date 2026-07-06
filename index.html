@@ -278,12 +278,16 @@ function renderSidebar(){
       const sLi=document.createElement('li');sLi.className='section-item';
       const a=document.createElement('a');a.className='section-link';a.href=`#s${si}-${ci}`;
       a.textContent=sec.title.substring(0,42);
+      a.addEventListener('click',(e)=>{
+        e.preventDefault();
+        const el=document.getElementById(`s${si}-${ci}`);
+        if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+        if(innerWidth<=900)document.getElementById('sidebar').classList.remove('open');
+      });
       sLi.appendChild(a);sl.appendChild(sLi);
     });
     btn.addEventListener('click',()=>{
       sl.classList.toggle('open');btn.querySelector('.arrow').classList.toggle('open');
-      document.getElementById(`stage-${si}`)?.scrollIntoView({behavior:'smooth',block:'start'});
-      if(innerWidth<=900) document.getElementById('sidebar').classList.remove('open');
     });
     li.appendChild(btn);li.appendChild(sl);nav.appendChild(li);
   });
